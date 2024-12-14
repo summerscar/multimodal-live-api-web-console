@@ -37,7 +37,7 @@ const declaration: FunctionDeclaration = {
 
 function AltairComponent() {
   const [jsonString, setJSONString] = useState<string>("");
-  const { client, setConfig } = useLiveAPIContext();
+  const { client, setConfig, connect, config } = useLiveAPIContext();
 
   useEffect(() => {
     setConfig({
@@ -101,7 +101,17 @@ function AltairComponent() {
       vegaEmbed(embedRef.current, JSON.parse(jsonString));
     }
   }, [embedRef, jsonString]);
-  return <div className="vega-embed" ref={embedRef} />;
+  return (
+    <>
+      <div className="vega-embed" ref={embedRef} />
+      <div style={{ textAlign: "center" }}>
+        <p>{config.systemInstruction?.parts[0].text}</p>
+        <button onClick={connect} type="button">
+          Connect (Example for Vega-Altair)
+        </button>
+      </div>
+    </>
+  );
 }
 
 export const Altair = memo(AltairComponent);

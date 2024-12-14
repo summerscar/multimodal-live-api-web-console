@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.scss";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import SidePanel from "./components/side-panel/SidePanel";
@@ -23,9 +23,6 @@ import ControlTray from "./components/control-tray/ControlTray";
 import cn from "classnames";
 
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY as string;
-if (typeof API_KEY !== "string") {
-  throw new Error("set REACT_APP_GEMINI_APIK_KEY in .env");
-}
 
 const host = "generativelanguage.googleapis.com";
 const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
@@ -36,10 +33,25 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   // either the screen capture, the video or null, if null we hide it
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const [apiKey, setApiKey] = useState(API_KEY);
+
+  const requestApiKey = () => {
+    const key = window.prompt("Enter your API key");
+    if (key) {
+      setApiKey(key);
+    }
+  };
 
   return (
     <div className="App">
-      <LiveAPIProvider url={uri} apiKey={API_KEY}>
+      {!apiKey && (
+        <div className="api-key-request" style={{ textAlign: "center" }}>
+          <button onClick={requestApiKey} type="button">
+            Please enter your API key
+          </button>
+        </div>
+      )}
+      <LiveAPIProvider url={uri} apiKey={apiKey}>
         <div className="streaming-console">
           <SidePanel />
           <main>
